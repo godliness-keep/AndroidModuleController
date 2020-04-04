@@ -37,9 +37,21 @@ public abstract class BaseStateBar extends BaseBar implements View.OnClickListen
      */
     public abstract void onLoading(boolean loading);
 
+    @Override
+    protected final boolean attachToRoot() {
+        return true;
+    }
+
     public static final class Status {
 
+        /**
+         * Network error
+         */
         public static final int STATUS_NETWORK_ERROR = -1;
+        /**
+         * Unknown state
+         */
         public static final int STATUS_UNKNOWN = 0;
     }
+
 }

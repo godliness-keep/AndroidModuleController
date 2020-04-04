@@ -2,7 +2,6 @@ package com.godliness.android.base.controller;
 
 import android.view.View;
 import android.view.ViewParent;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
 /**
@@ -12,15 +11,14 @@ import android.view.animation.Animation;
  */
 public abstract class BaseControllerBar extends BaseBar {
 
-    private Animation mShowAnimation;
-    private Animation mHideAnimation;
     private View.OnAttachStateChangeListener mStateChangeCallback;
     private Animation.AnimationListener mHideAnimationCallback;
 
     /**
      * Show bar
      */
-    protected void show(boolean openAnimation) {
+    @Override
+    public void show(boolean openAnimation) {
         if (openAnimation) {
             if (mStateChangeCallback == null) {
                 getBarView().addOnAttachStateChangeListener(getStateChangeCallback());
@@ -32,7 +30,8 @@ public abstract class BaseControllerBar extends BaseBar {
     /**
      * Hide bar
      */
-    protected void hide(boolean openAnimation) {
+    @Override
+    public void hide(boolean openAnimation) {
         if (openAnimation) {
             final ViewParent parent = getBarView().getParent();
             if (parent != null) {
@@ -43,23 +42,6 @@ public abstract class BaseControllerBar extends BaseBar {
         }
     }
 
-    /**
-     * Return animation when show bar
-     */
-    protected Animation createShowAnimation() {
-        final Animation showAnimation = new AlphaAnimation(1, 1);
-        showAnimation.setDuration(300);
-        return showAnimation;
-    }
-
-    /**
-     * Return animation when hide bar
-     */
-    protected Animation createHideAnimation() {
-        final Animation hideAnimation = new AlphaAnimation(1, 0);
-        hideAnimation.setDuration(300);
-        return hideAnimation;
-    }
 
     @Override
     protected void release() {
@@ -69,19 +51,25 @@ public abstract class BaseControllerBar extends BaseBar {
         }
     }
 
-    private Animation getShowAnimation() {
-        if (mShowAnimation == null) {
-            mShowAnimation = createShowAnimation();
-        }
-        return mShowAnimation;
-    }
+    @Override
+    protected final Animation.AnimationListener getHideAnimationCallback() {
+        if (mHideAnimationCallback == null) {
+            mHideAnimationCallback = new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
 
-    private Animation getHideAnimation() {
-        if (mHideAnimation == null) {
-            mHideAnimation = createHideAnimation();
-            mHideAnimation.setAnimationListener(getHideAnimationCallback());
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    detachFromController();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            };
         }
-        return mHideAnimation;
+        return mHideAnimationCallback;
     }
 
     private View.OnAttachStateChangeListener getStateChangeCallback() {
@@ -93,27 +81,10 @@ public abstract class BaseControllerBar extends BaseBar {
                 }
 
                 @Override
-                public void onViewDetachedFromWindow(View v) { }
+                public void onViewDetachedFromWindow(View v) {
+                }
             };
         }
         return mStateChangeCallback;
-    }
-
-    private Animation.AnimationListener getHideAnimationCallback() {
-        if (mHideAnimationCallback == null) {
-            mHideAnimationCallback = new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {}
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    detachFromController();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) { }
-            };
-        }
-        return mHideAnimationCallback;
     }
 }

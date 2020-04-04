@@ -4,15 +4,16 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import com.godliness.android.base.controller.utils.NetUtils;
 
 /**
  * Created by godliness on 2020-03-30.
@@ -146,7 +147,7 @@ public abstract class BaseController {
     }
 
     protected final boolean hasNetwork() {
-        return hasNetwork(getContext());
+        return NetUtils.hasNetwork(getContext());
     }
 
     protected final int getConfigurationOrientation() {
@@ -156,7 +157,7 @@ public abstract class BaseController {
         return getResources().getConfiguration().orientation;
     }
 
-    protected final boolean isPortrait() {
+    protected final boolean screenOrientationFromPortrait() {
         return getConfigurationOrientation() == Configuration.ORIENTATION_PORTRAIT;
     }
 
@@ -167,16 +168,5 @@ public abstract class BaseController {
         }
         initController();
         regEvent(true);
-    }
-
-    private boolean hasNetwork(Context cxt) {
-        if (cxt != null) {
-            final ConnectivityManager manager = (ConnectivityManager) cxt.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (manager != null) {
-                final NetworkInfo info = manager.getActiveNetworkInfo();
-                return info != null && info.isAvailable();
-            }
-        }
-        return false;
     }
 }

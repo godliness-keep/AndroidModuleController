@@ -50,14 +50,6 @@ public abstract class BaseTemplateController<TitleBar extends BaseControllerBar,
     protected abstract void initTemplate();
 
     /**
-     * Register related events
-     *
-     * @param isClick register/unregister
-     */
-    @Override
-    protected abstract void regEvent(boolean isClick);
-
-    /**
      * Return controller layout id
      *
      * @return Layout resource id
@@ -75,54 +67,26 @@ public abstract class BaseTemplateController<TitleBar extends BaseControllerBar,
         hide(true);
     }
 
+    protected boolean switchTitleBar() {
+        return false;
+    }
+
+    protected boolean switchBottomBar() {
+        return false;
+    }
+
     @Override
-    public final void show(boolean openAnim) {
-        if (mTitleBar != null) {
-            mTitleBar.show(openAnim);
-        }
-        if (mBottomBar != null) {
-            mBottomBar.show(openAnim);
-        }
+    public void show(boolean openAnim) {
+        initTitleBar();
+        initBottomBar();
+        showBar(openAnim);
         this.mShowing = true;
     }
 
     @Override
-    public final void hide(boolean openAnim) {
-        if (mTitleBar != null) {
-            mTitleBar.hide(openAnim);
-        }
-        if (mBottomBar != null) {
-            mBottomBar.hide(openAnim);
-        }
+    public void hide(boolean openAnim) {
+        hideBar(openAnim);
         this.mShowing = false;
-    }
-
-    @Nullable
-    protected final StateBar getStateBar() {
-        return mStateBar;
-    }
-
-    @Nullable
-    protected final TitleBar getTitleBar() {
-        return mTitleBar;
-    }
-
-    @Nullable
-    protected final BottomBar getBottomBar() {
-        return mBottomBar;
-    }
-
-    @Override
-    public final boolean isShowing() {
-        return mShowing;
-    }
-
-    @Override
-    protected final void initController() {
-        initTitleBar();
-        initBottomBar();
-        initStateBar();
-        initTemplate();
     }
 
     @Override
@@ -139,30 +103,80 @@ public abstract class BaseTemplateController<TitleBar extends BaseControllerBar,
         }
     }
 
+    protected void initTitleBar() {
+        if (mTitleBar == null || switchTitleBar()) {
+            mTitleBar = createTitleBar();
+        }
+        if (mTitleBar != null) {
+            mTitleBar.initBarFromController(getControllerView());
+        }
+    }
+
+    protected void initBottomBar() {
+        if (mBottomBar == null || switchBottomBar()) {
+            mBottomBar = createBottomBar();
+        }
+        if (mBottomBar != null) {
+            mBottomBar.initBarFromController(getControllerView());
+        }
+    }
+
+    @Nullable
+    protected final TitleBar getTitleBar() {
+        return mTitleBar;
+    }
+
+    @Nullable
+    protected final BottomBar getBottomBar() {
+        return mBottomBar;
+    }
+
+    @Nullable
+    protected final StateBar getStateBar() {
+        return mStateBar;
+    }
+
+    @Override
+    public final boolean isShowing() {
+        return mShowing;
+    }
+
+    @Override
+    protected final void initController() {
+        initStateBar();
+        initTemplate();
+    }
+
+    private void showBar(boolean openAnim) {
+        if (mTitleBar != null) {
+            mTitleBar.show(openAnim);
+        }
+        if (mBottomBar != null) {
+            mBottomBar.show(openAnim);
+        }
+        if (mStateBar != null) {
+            mStateBar.show(openAnim);
+        }
+    }
+
+    private void hideBar(boolean openAnim) {
+        if (mTitleBar != null) {
+            mTitleBar.hide(openAnim);
+        }
+        if (mBottomBar != null) {
+            mBottomBar.hide(openAnim);
+        }
+        if (mStateBar != null) {
+            mStateBar.hide(openAnim);
+        }
+    }
+
     private void initStateBar() {
         if (mStateBar == null) {
             mStateBar = createStateBar();
         }
         if (mStateBar != null) {
-            mStateBar.attachBarToController(getControllerView());
-        }
-    }
-
-    private void initTitleBar() {
-        if (mTitleBar == null) {
-            mTitleBar = createTitleBar();
-        }
-        if (mTitleBar != null) {
-            mTitleBar.attachBarToController(getControllerView());
-        }
-    }
-
-    private void initBottomBar() {
-        if (mBottomBar == null) {
-            mBottomBar = createBottomBar();
-        }
-        if (mBottomBar != null) {
-            mBottomBar.attachBarToController(getControllerView());
+            mStateBar.initBarFromController(getControllerView());
         }
     }
 }
